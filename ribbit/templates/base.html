@@ -28,11 +28,16 @@
 			<div class="flash error">
 				{{ auth_form.non_field_errors}}
 				{{ user_form.non_field_errors }}
-				{{ ribbit_form.errors }}
+				{{ ribbit_form.content.errors }}
 			</div>
-			{ %endif %}
+			{% endif %}
+			{% if notice %}
+			<div class="flash notice">
+				{{ notice }}
+			</div>
+			{% endif %}
 			{% endblock %}
-			{ % block content %}
+			{% block content %}
 			{% endblock %}
 		</div>
 	</div>

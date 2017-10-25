@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block login %}
+	<form action="/login" method="post">{% csrf_token %}
+		{%for field in auth_form %}
+		{{ field }}
+		{% endfor %}
+		<input type="submit" id="btnLogIn" value="Log In">
+	</form>
+{% endblock %}
+
+{% block content %}
+{% if auth_form.non_field_errors or user_form.non_field_errors %}
+<div class="flash error">
+	{{ auth_form.non_field_errors }}
+	{{ user_form.non_field_errors }}
+</div>
+{% endif %}
+<img src="{{ STATIC_URL }}gfx/frog.jpg">
+<div class="panel right">
+	<h1>New to Ribbit?</h1>
+	<p>
+		<form action="/signup" method="post">{% csrf_token %}
+			{% for field in user_form %}
+			{{ field }}
+			{% endfor %}
+			<input type="submit" value="Create Account">
+		</form>
+	</p>
+</div>
+{% endblock %}
+
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet/less" href="style.less">
+	<script src="less.js"></script>
+</head>
+<body>
+	<header>
+		<div class="wrapper">
+			<img src="gfx/logo.png">
+			<span>Twitter Clone</span>
+			<form>
+				<input name="email" type="text">
+				<input name="password" type="password">
+			</form>
+		</div>
+	</header>
+	<div id="content">
+		<div class="wrapper">
+			<img src="gfx/frog.jpg">
+			<div class="panel right">
+				<h1>New to Ribbit?</h1>
+				<p>
+					<form>
+						<input name="email" type="text">
+						<input name="password" type="text">
+						<input name="password2" type="password">
+						<input type="submit" value="Create Account">
+					</form>
+				</p>
+			</div>
+		</div>
+	</div>
+	<footer>
+		<div class="wrapper">
+			Ribbit - A Twitter Clone Tutorial<img src="gfx/logo-nettuts.png">
+		</div>
+	</footer>
+</body>
+</html>
+-->
