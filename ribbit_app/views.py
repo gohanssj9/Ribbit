@@ -1,66 +1,3 @@
-'''
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from django.shortcuts import render,redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.models import User
-from ribbit_app.forms import AuthenticateForm, UserCreateForm, RibbitForm
-from ribbit_app.models import Ribbit
-
-# Create your views here.
-def index(request,auth_form=None,user_form=None):
-	if request.user.is_authenticated():
-		ribbit_form = RibbitForm()
-		user = request.user
-		ribbits_self = Ribbit.objects.filter(user=user.id)
-		ribbits_buddies = Ribbit.objects.filter(user__userprofile__in=user.profile.follows.all)
-		ribbits = ribbits_self | ribbits_buddies
-		return render(request,
-						'buddies.html',
-						{'ribbit_form':ribbit_form,'user':user,
-						'ribbits':ribbits,
-						'next_url':'/',})
-	else:
-		auth_form = auth_form or AuthenticateForm()
-		user_form = user_form or UserCreateForm()
-
-		return render(request,
-						'home.html',
-						{'auth_form':auth_form,'user_form':user_form,})
-
-def login_view(request):
-	if request.method == 'POST':
-		form = AuthenticateForm(data=request.POST)
-		print "Heyy"
-		if form.is_valid():
-			print "Hellooo"
-			login(request,form.get_user())
-			return redirect('/')
-		else:
-			return index(request,auth_form=form)
-	return redirect('/')
-
-def logout_view(request):
-	logout(request)
-	return redirect('/')
-
-def signup(request):
-	user_form = UserCreateForm(data=request.POST)
-	if request.method == 'POST':
-		print "Hi there"
-		if user_form.is_valid():
-			print "Hello"
-			username = user_form.clean_username()
-			password = user_form.clean_password2()
-			user_form.save()
-
-			user=authenticate(username=username,password=password)
-			login(request,user)
-			return redirect('/')
-		else:
-			return index(request,user_form=user_form)
-	return redirect('/')
-'''
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -98,10 +35,8 @@ def index(request, auth_form=None, user_form=None):
 
 def login_view(request):
     if request.method == 'POST':
-        print "hii"
         form = AuthenticateForm(data=request.POST)
         if form.is_valid():
-            print "heyy"
             login(request, form.get_user())
             # Success
             return redirect('/')
@@ -119,9 +54,7 @@ def logout_view(request):
 def signup(request):
     user_form = UserCreateForm(data=request.POST)
     if request.method == 'POST':
-        print "hello"
     	if user_form.is_valid():
-    	    print "hi"
             username = user_form.clean_username()
             password = user_form.clean_password2()
             user_form.save()
@@ -132,3 +65,25 @@ def signup(request):
             return index(request, user_form=user_form)
     return redirect('/')
 
+@login_required
+def submit(request):
+	if request.method == "POST":
+		ribbit_form = RibbitForm(data=request.POST)
+		next_url = request.POST.get("next_url","/")
+		if ribbit_form.is_valid():
+			ribbit = ribbit_form.save(commit=False)
+			ribbit.user=request.user
+			ribbit.save()
+			return redirect(next_url)
+		else:
+			return public(request,ribbit_form)
+	return redirect('/')
+
+@login_required
+def public(request,ribbit_form=None):
+	ribbit_form = ribbit_form or RibbitForm()
+	ribbits = Ribbit.objects.reverse()[:10]
+	return render(request,
+					'public.html',
+					{'ribbit_form':ribbit_form,'next_url':'/ribbits',
+					'ribbits':ribbits,'username':request.user.username})

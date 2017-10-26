@@ -15,14 +15,14 @@
 				{% endfor %}
 
 				<input type="hidden" value="{{ next_url }}" name="next_url">
-				<input type="submit" value="Ribbit!"
+				<input type="submit" value="Ribbit!">	
 			</form>
 		</p>
 	</div>
 
 	<div class="panel left">
 		<h1>Buddies' Ribbits</h1>
-		{% for ribbits in ribbits %}
+		{% for ribbit in ribbits %}
 		<div class="ribbitWrapper">
 			<a href="/users/{{ ribbit.user.username }}">
 				<img class="avatar" src="{{ ribbit.user.profile.gravatar_url }}">
